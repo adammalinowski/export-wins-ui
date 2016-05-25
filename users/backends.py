@@ -21,7 +21,7 @@ class RelayedBackend(object):
             username=username, defaults={"password": "*"})
 
         # Attach the data server's token to the user object temporarily so that
-        # the LoginForm can put it into a cookie.
+        # the LoginView can put it into a cookie.
         user.token = response.json()["token"]
 
         return user

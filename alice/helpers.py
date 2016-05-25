@@ -111,3 +111,61 @@ def get_form_field(spec):
             kwargs["widget"] = forms.widgets.Textarea
 
     return field(**kwargs)
+
+
+class Rabbit(object):
+
+    def get(self, *args, **kwargs):
+        self._request("post", *args, **kwargs)
+
+    def post(self, *args, **kwargs):
+        self._request("post", *args, **kwargs)
+
+    def _request(self, method, *args, keep_trying=False, request=None, **kwargs):
+        """
+        A cleaner way to allow API calls to the data server without having to
+        repeat all of the boiler-plate key signing stuff.
+
+        :param method: The HTTP method in lower case: "get", "post", etc.
+        :param keep_trying: Set to True if you won't settle for ConnectionError
+        :param request: A django request object
+        :param args: Passed directly to requests.<method>()
+        :param kwargs: Passed directly to requests.<method>()
+
+        :return: A requests response object
+        """
+
+        prepared_request = requests.Request(method, *args, **kwargs).prepare()
+
+        if request and request.COOKIES and "alice" in request.COOKIES:
+            prepared_request.headers["Authorization"] = "Token {}".format(
+                request.COOKIES["alice"]
+            )
+
+        url = urlsplit(args[0])
+        path = bytes(url.path, "utf-8")
+        if url.query:
+            path += bytes("?{}".format(url.query), "utf-8")
+        salt = bytes(settings.UI_SECRET, "utf-8")
+
+        body = prepared_request.body or b""
+        if isinstance(body, str):
+            body = bytes(body, "utf-8")
+
+        signature = sha256(path + body + salt).hexdigest()
+        prepared_request.headers["X-Signature"] = signature
+
+        response = send_request(prepared_request, keep_trying)
+
+        if response.status_code > 299:
+            logger.error(response.status_code)
+            logger.error(response.content)
+
+        if response.status_code == 403:
+            raise RabbitException("Data server access is failing for {} requests "
+                                  "to {}.".format(method, str(path, "utf-8")))
+
+        return response
+
+
+rabbit2 = Rabbit()
