@@ -12,6 +12,9 @@
       float: left;
       max-width: 80%;
     }
+    table.win-details tr th {
+      text-align: left;
+    }
   </style>
 {% endblock css %}
 
@@ -47,10 +50,45 @@
     {{ form.non_field_errors }}
   {% endif %}
 
-  <div class="win-details">
-    {{ win }}
-    
-  </div>
+  <h3>Export Win Details</h3>
+  <table class="win-details table table-striped table-responsive">
+    <tr>
+      <th>{{ win.type.label }}</th>
+      <td>{{ win.type.value }}</td>
+    </tr>
+    <tr>
+      <th>{{ win.description.label }}</th>
+      <td>{{ win.description.value }}</td>
+    </tr>
+    <tr>
+      <th>{{ win.goods_vs_services.label }}</th>
+      <td>{{ win.goods_vs_services.value }}</td>
+    </tr>
+    <tr>
+      <th>{{ win.customer_location.label }}</th>
+      <td>{{ win.customer_location.value }}</td>
+    </tr>
+    <tr>
+      <th>{{ win.country.label }}</th>
+      <td>{{ win.country.value }}</td>
+    </tr>
+    <tr>
+      <th>{{ win.date.label }}</th>
+      <td>{{ win.date.value }}</td>
+    </tr>
+    <tr>
+      <th>{{ win.created.label }}</th>
+      <td>{{ win.created.value }}</td>
+    </tr>
+    <tr>
+      <th>{{ win.total_expected_export_value.label }}</th>
+      <td>£{{ win.total_expected_export_value.value }}</td>
+    </tr>
+    <tr>
+      <th>{{ win.total_expected_non_export_value.label }}</th>
+      <td>£{{ win.total_expected_non_export_value.value }}</td>
+    </tr>
+  </table>
 
   <form method="post">
 
@@ -204,7 +242,7 @@
       {% if form.name.help_text %}<div class="help-text">{{ form.name.help_text }}</div>{% endif %}
     </div>
 
-    {{ form.win_id }}
+    {{ form.win }}
 
     {% csrf_token %}
 

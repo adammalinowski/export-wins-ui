@@ -50,17 +50,33 @@ class ConfirmationView(FormView):
 
         return FormView.dispatch(self, request, *args, **kwargs)
 
+    def get_form_kwargs(self):
+        r = FormView.get_form_kwargs(self)
+        r["request"] = self.request
+        r["initial"]["win"] = self.kwargs["pk"]
+        return r
+
     def get_context_data(self, **kwargs):
 
         win_url = "{}{}/".format(settings.LIMITED_WINS_AP, self.kwargs["pk"])
+        schema_url = "{}schema/".format(settings.WINS_AP)
+
+        win = rabbit.get(schema_url).json()
+        values = rabbit.get(win_url).json()
+        for key, value in values.items():
+            win[key]["value"] = value
 
         context = FormView.get_context_data(self, **kwargs)
-        context.update({"win": rabbit.get(win_url).json()})
-        print(context)
+        context.update({"win": win})
+
         return context
 
     def get_success_url(self):
         return reverse("thanks")
+
+    def form_valid(self, form):
+        form.save()
+        return FormView.form_valid(self, form)
 
     def denied(self, request, *args, **kwargs):
         return self.response_class(
