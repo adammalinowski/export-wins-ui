@@ -66,7 +66,7 @@ class ConfirmationView(FormView):
         now = timezone.now()
 
         win_url = "{}{}/".format(settings.WINS_AP, pk)
-        win = rabbit("get", win_url, request=request)
+        win = rabbit.get(win_url, request=request)
 
         if not win.status_code == 200:
             raise self.SecurityException("That key appears to be invalid")
@@ -86,7 +86,7 @@ class ConfirmationView(FormView):
     def _check_already_submitted(pk, request):
         ap = settings.CONFIRMATIONS_AP
         confirmation_url = "{}?win__id={}".format(ap, pk)
-        confirmation = rabbit("get", confirmation_url, request=request).json()
+        confirmation = rabbit.get(confirmation_url, request=request).json()
 
         if bool(confirmation["count"]):
             raise self.SecurityException("This confirmation was already completed.")

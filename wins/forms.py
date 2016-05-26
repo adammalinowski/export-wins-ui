@@ -145,14 +145,14 @@ class WinForm(BootstrappedForm, metaclass=WinReflectiveFormMetaclass):
         goes wrong.
         """
 
-        rabbit("post", settings.NOTIFICATIONS_AP, data={
+        rabbit.post(settings.NOTIFICATIONS_AP, data={
             "win": win_id,
             "type": "o",
             "user": self.request.user.pk,
         })
 
         # Disabled until we get the go-ahead
-        # rabbit("post", settings.NOTIFICATIONS_AP, data={
+        # rabbit.post(settings.NOTIFICATIONS_AP, data={
         #     "win": win_id,
         #     "type": "c",
         #     "recipient": self.cleaned_data["customer_email_address"],
@@ -166,7 +166,7 @@ class WinForm(BootstrappedForm, metaclass=WinReflectiveFormMetaclass):
         # The POST request is http-url-encoded rather than json-encoded for now
         # since I don't know how to set it that way and don't have the time to
         # find out.
-        response = rabbit("post", ap, data=data, request=self.request)
+        response = rabbit.post(ap, data=data, request=self.request)
 
         if not response.status_code == 201:
             raise forms.ValidationError(
@@ -215,7 +215,7 @@ class WinForm(BootstrappedForm, metaclass=WinReflectiveFormMetaclass):
 
     def _add_advisor_fields(self):
 
-        schema = rabbit("get", settings.ADVISORS_AP + "schema/").json()
+        schema = rabbit.get(settings.ADVISORS_AP + "schema/").json()
 
         for i in range(0, 5):
             for name, spec in schema.items():
@@ -239,3 +239,4 @@ class ConfirmationForm(BootstrappedForm, metaclass=ConfirmationFormMetaclass):
         BootstrappedForm.__init__(self, *args, **kwargs)
 
         self.fields["win_id"].widget = forms.widgets.HiddenInput()
+

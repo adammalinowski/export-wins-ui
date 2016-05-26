@@ -26,8 +26,8 @@ class ReflectiveFormMetaclass(forms.forms.DeclarativeFieldsMetaclass):
         new_class = forms.forms.DeclarativeFieldsMetaclass.__new__(
             mcs, name, bases, attrs)
 
-        fields = rabbit(
-            "get", mcs.reflection_url + "schema/", keep_trying=True).json()
+        fields = rabbit.get(
+            mcs.reflection_url + "schema/", keep_trying=True).json()
 
         # Attach the schema to the class itself 'cause it's handy
         new_class._schema = fields

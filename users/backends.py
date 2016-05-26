@@ -8,7 +8,7 @@ class RelayedBackend(object):
 
     def authenticate(self, username=None, password=None):
 
-        response = rabbit("post", settings.LOGIN_AP, data={
+        response = rabbit.post(settings.LOGIN_AP, data={
             "username": username,
             "password": password
         })

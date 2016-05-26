@@ -28,7 +28,7 @@ class LogoutView(RedirectView):
 
     def get(self, request, *args, **kwargs):
         logout(self.request)  # Local
-        rabbit("get", settings.LOGOUT_AP)  # Remote
+        rabbit.get(settings.LOGOUT_AP)  # Remote
         response = RedirectView.get(self, request, *args, **kwargs)
         response.delete_cookie("alice")
         return response
