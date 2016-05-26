@@ -50,6 +50,15 @@ class ConfirmationView(FormView):
 
         return FormView.dispatch(self, request, *args, **kwargs)
 
+    def get_context_data(self, **kwargs):
+
+        win_url = "{}{}/".format(settings.LIMITED_WINS_AP, self.kwargs["pk"])
+
+        context = FormView.get_context_data(self, **kwargs)
+        context.update({"win": rabbit.get(win_url).json()})
+        print(context)
+        return context
+
     def get_success_url(self):
         return reverse("thanks")
 
@@ -82,14 +91,15 @@ class ConfirmationView(FormView):
 
         return win
 
-    @staticmethod
-    def _check_already_submitted(pk, request):
+    def _check_already_submitted(self, pk, request):
         ap = settings.CONFIRMATIONS_AP
         confirmation_url = "{}?win__id={}".format(ap, pk)
         confirmation = rabbit.get(confirmation_url, request=request).json()
 
         if bool(confirmation["count"]):
-            raise self.SecurityException("This confirmation was already completed.")
+            raise self.SecurityException(
+                "This confirmation was already completed."
+            )
 
 
 class ThanksView(TemplateView):

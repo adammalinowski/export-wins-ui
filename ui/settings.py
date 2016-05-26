@@ -136,6 +136,7 @@ STATIC_URL = '/static/'
 # Application authorisation
 DATA_SERVER = os.getenv("DATA_SERVER")
 WINS_AP = "{}/wins/".format(DATA_SERVER)
+LIMITED_WINS_AP = "{}/limited-wins/".format(DATA_SERVER)
 CONFIRMATIONS_AP = "{}/confirmations/".format(DATA_SERVER)
 BREAKDOWNS_AP = "{}/breakdowns/".format(DATA_SERVER)
 ADVISORS_AP = "{}/advisors/".format(DATA_SERVER)
