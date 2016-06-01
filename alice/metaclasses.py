@@ -6,16 +6,6 @@ from .helpers import rabbit, get_form_field
 
 class ReflectiveFormMetaclass(forms.forms.DeclarativeFieldsMetaclass):
 
-    TYPES_MAP = {
-        "string": forms.CharField,
-        "email": forms.EmailField,
-        "choice": forms.ChoiceField,
-        "integer": forms.IntegerField,
-        "boolean": forms.BooleanField,
-        "date": forms.DateField,
-        "datetime": forms.DateTimeField
-    }
-
     reflection_url = None
 
     def __new__(mcs, name, bases, attrs):

@@ -42,14 +42,15 @@ def get_form_field(spec):
 
     if "choices" in spec:
         kwargs["choices"] = [
-            [c["value"], c["display_name"]] for c in spec["choices"]]
+            (c["value"], c["display_name"]) for c in spec["choices"]]
         if not kwargs["required"]:
             kwargs["choices"].insert(0, ("", ""))
 
+    if "max_length" in spec:
+        kwargs["max_length"] = spec["max_length"]
+
     if spec["type"] == "string":
-        if "max_length" in spec:
-            kwargs["max_length"] = spec["max_length"]
-        else:
+        if "max_length" not in spec:
             kwargs["widget"] = forms.widgets.Textarea
 
     return field(**kwargs)
