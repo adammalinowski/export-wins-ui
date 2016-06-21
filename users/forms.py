@@ -30,8 +30,9 @@ class LoginForm(BootstrappedForm):
         if self._errors:
             return cleaned_data
 
+        # Try logging in on data server
         self._login()
-        
+
         return self.cleaned_data
 
     def _login(self):
@@ -51,6 +52,8 @@ class LoginForm(BootstrappedForm):
             forms.ValidationError(
                 "There was a problem logging in.  Please try again later.")
 
+        # Data server has logged user in, get user data and session cookie from
+        # data server and pass to view for creating the JWT
         self.user = response.json()
         self.session_cookie = self._get_cookie(response.cookies)
 

@@ -182,6 +182,10 @@ class WinForm(RabbitMixin, BootstrappedForm,
         """
 
         # tell data server to send officer notification
+        # initially concieved to tell officer that customer notifciation has
+        # been sent, but since that is currently manually managed, we in fact
+        # only send an intermediate email letting them know that someday we will
+        # send the customer an email (later by manual process)
         rabbit.post(settings.NOTIFICATIONS_AP, data={
             "win": win_id,
             "type": "o",  # officer notification
