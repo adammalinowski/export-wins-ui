@@ -181,15 +181,20 @@ class WinForm(RabbitMixin, BootstrappedForm,
         goes wrong.
         """
 
+        # tell data server to send officer notification
         rabbit.post(settings.NOTIFICATIONS_AP, data={
             "win": win_id,
-            "type": "o",
+            "type": "o",  # officer notification
             "user": self.request.user.pk,
         })
 
+        # tell data server to send customer notification email
+        # commented out until we are ready to send automatically, currently sent
+        # manually by gino after being generated manually by management command
+
         # rabbit.post(settings.NOTIFICATIONS_AP, data={
         #     "win": win_id,
-        #     "type": "c",
+        #     "type": "c",  # customer notification
         #     "recipient": self.cleaned_data["customer_email_address"],
         #     "url": self.request.build_absolute_uri(
         #         reverse("responses", kwargs={"pk": win_id})

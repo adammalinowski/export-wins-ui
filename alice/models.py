@@ -2,6 +2,9 @@ class User(object):
     """
     Not a real user, but enough so that a typical Django user property test
     will pass.
+
+    Primarily used for user.is_authenticated in template.
+
     """
 
     def __init__(self, is_authenticated=True, **kwargs):

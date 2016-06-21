@@ -85,10 +85,10 @@ class Rabbit(object):
         prepared_request = requests.Request(
             method, url, *args, **kwargs).prepare()
 
-        # prepared_request.headers["Content-Type"] = "application/json"
-        if request and request.alice_id:
+        # Pass session ID from JWT middleware to data server
+        if request and request.alice_session_id:
             prepared_request.headers["Cookie"] = "sessionid={}".format(
-                request.alice_id
+                request.alice_session_id
             )
 
         url = urlsplit(url)

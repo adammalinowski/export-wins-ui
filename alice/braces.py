@@ -18,7 +18,7 @@ class LoginRequiredMixin(object):
     """
 
     def dispatch(self, request, *args, **kwargs):
-        if not request.alice_id:
+        if not request.alice_session_id:
             return self.redirect_to_login(
                 self.request.get_full_path(),
                 force_text(settings.LOGIN_URL)

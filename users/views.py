@@ -12,24 +12,33 @@ from .forms import LoginForm
 
 
 class LoginView(FormView):
+    """ Login in data server and set JWT cookie for user """
 
     form_class = LoginForm
     template_name = "users/login.html"
 
     def form_valid(self, form):
+        """ Set JWT cookie for user from data given by data server """
+
         response = FormView.form_valid(self, form)
+
+        alice_jwt = jwt.encode(
+            {
+                "user": form.user,
+                "session": form.session_cookie.value
+            },
+            settings.UI_SECRET
+        )
+
+        # Transform from unix time to proper cookie time
+        expires = datetime.fromtimestamp(
+            form.session_cookie.expires
+        ).strftime('%a, %d %b %Y %H:%M:%S'),
+
         response.set_cookie(
             "alice",
-            value=jwt.encode(
-                {
-                    "user": form.user,
-                    "session": form.session_cookie.value
-                },
-                settings.UI_SECRET
-            ),
-            expires=datetime.fromtimestamp(
-                form.session_cookie.expires
-            ).strftime('%a, %d %b %Y %H:%M:%S'),
+            value=alice_jwt,
+            expires=expires,
             secure=settings.SESSION_COOKIE_SECURE,
             httponly=True
         )
