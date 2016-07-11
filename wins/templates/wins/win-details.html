@@ -1,0 +1,168 @@
+{% extends 'ui/base.html' %}
+
+{% load staticfiles %}
+
+{% block css %}
+  {{ block.super }}
+  <style>
+    .field {
+      margin-bottom: 1em;
+    }
+    .name {
+      font-weight: bold;
+    }
+    .value {
+
+    }
+  </style>
+{% endblock css %}
+
+{% block content %}
+
+    <h1>Win</h1>
+
+    {{ win }}
+
+    <h3>Lead officer's details</h3>
+
+    {% include "wins/win-details-element.html" with name="Lead Officer" val=win.lead_officer_name %}
+    {% include "wins/win-details-element.html" with name="Lead Officer's Email Address" val=win.lead_officer_email_address required=False %}
+    {% include "wins/win-details-element.html" with name="Other Official Email Address" val=win.other_official_email_address required=False %}
+    {% include "wins/win-details-element.html" with name="Team Type" val=win.team_type %}
+    {% include "wins/win-details-element.html" with name="HQ Team/Region/Post" val=win.hq_team %}
+    {% include "wins/win-details-element.html" with name="Location" val=win.location required=False %}
+    {% include "wins/win-details-element.html" with name="Line Manager" val=win.line_manager_name %}
+
+    <h3>Customer's details</h3>
+
+    {% include "wins/win-details-element.html" with name="Organisation or company name" val=win.company_name %}
+    {% include "wins/win-details-element.html" with name="Company's CDMS Reference" val=win.cdms_reference %}
+    {% include "wins/win-details-element.html" with name="Customer contact name" val=win.customer_name %}
+    {% include "wins/win-details-element.html" with name="Customer job title" val=win.customer_job_title %}
+    {% include "wins/win-details-element.html" with name="Customer email" val=win.customer_email_address %}
+    {% include "wins/win-details-element.html" with name="Customer or organisation HQ location" val=win.customer_location %}
+
+    <h3>Details of Export Win</h3>
+
+    {% include "wins/win-details-element.html" with name="What kind of business deal best describes this win" val=win.business_type %}
+    {% include "wins/win-details-element.html" with name="How was the company supported in achieving this win" val=win.description %}
+    {% include "wins/win-details-element.html" with name="What is the name of their overseas customer" val=win.name_of_customer %}
+    {% include "wins/win-details-element.html" with name="What are the goods or services that are being exported" val=win.name_of_export %}
+    {% include "wins/win-details-element.html" with name="Date business won" val=win.date %}
+    {% include "wins/win-details-element.html" with name="Country" val=win.country %}
+
+    <h3>Expected value of the win</h3>
+
+    {% include "wins/win-details-element.html" with name="Type of win" val=win.type %}
+
+    <h4>Export value</h4>
+
+    {% include "wins/win-details-element.html" with name="Total expected export value" val=win.total_expected_export_value %}
+
+   <table class="table table-responsive">
+      <tr>
+        <th>{{ form.breakdown_exports_0.label_tag }}</th>
+        <th>{{ form.breakdown_exports_1.label_tag }}</th>
+        <th>{{ form.breakdown_exports_2.label_tag }}</th>
+        <th>{{ form.breakdown_exports_3.label_tag }}</th>
+        <th>{{ form.breakdown_exports_4.label_tag }}</th>
+      </tr>
+      <tr>
+        <td>{{ win.breakdown_exports_0 }}</td>
+        <td>{{ win.breakdown_exports_1 }}</td>
+        <td>{{ win.breakdown_exports_2 }}</td>
+        <td>{{ win.breakdown_exports_3 }}</td>
+        <td>{{ win.breakdown_exports_4 }}</td>
+      </tr>
+    </table>
+
+    {% include "wins/win-details-element.html" with name="Does the expected export value relate to goods or services" val=win.goods_vs_services %}
+    {% include "wins/win-details-element.html" with name="Sector" val=win.sector %}
+
+    <h4>Non-export value</h4>
+
+    {% include "wins/win-details-element.html" with name="Total expected non-export value" val=win.total_expected_non_export_value %}
+
+    <table class="table table-responsive">
+      <tr>
+        <th>{{ form.breakdown_non_exports_0.label_tag }}</th>
+        <th>{{ form.breakdown_non_exports_1.label_tag }}</th>
+        <th>{{ form.breakdown_non_exports_2.label_tag }}</th>
+        <th>{{ form.breakdown_non_exports_3.label_tag }}</th>
+        <th>{{ form.breakdown_non_exports_4.label_tag }}</th>
+      </tr>
+      <tr>
+        <td>{{ win.breakdown_non_exports_0 }}</td>
+        <td>{{ win.breakdown_non_exports_1 }}</td>
+        <td>{{ win.breakdown_non_exports_2 }}</td>
+        <td>{{ win.breakdown_non_exports_3 }}</td>
+        <td>{{ win.breakdown_non_exports_4 }}</td>
+      </tr>
+    </table>
+
+    <hr />
+
+    <h3>
+      Contributing teams and advisers
+      <p>One individual or team per row.</p>
+    </h3>
+
+    <table id="advisors" class="advisors table table-responsive">
+      <tr>
+        <th>Name</th>
+        <th>Team Type</th>
+        <th>HQ Team<br />Region or Post</th>
+        <th>Location</th>
+      </tr>
+      <tr class="advisor">
+        <td>{{ form.advisor_0_name }}</td>
+        <td class="team-type">{{ form.advisor_0_team_type }}</td>
+        <td class="team-hq_team">{{ form.advisor_0_hq_team }}</td>
+        <td>{{ form.advisor_0_location }}</td>
+      </tr>
+      <tr class="advisor">
+        <td>{{ form.advisor_1_name }}</td>
+        <td class="team-type">{{ form.advisor_1_team_type }}</td>
+        <td class="team-hq_team">{{ form.advisor_1_hq_team }}</td>
+        <td>{{ form.advisor_1_location }}</td>
+      </tr>
+      <tr class="advisor">
+        <td>{{ form.advisor_2_name }}</td>
+        <td class="team-type">{{ form.advisor_2_team_type }}</td>
+        <td class="team-hq_team">{{ form.advisor_2_hq_team }}</td>
+        <td>{{ form.advisor_2_location }}</td>
+      </tr>
+      <tr class="advisor">
+        <td>{{ form.advisor_3_name }}</td>
+        <td class="team-type">{{ form.advisor_3_team_type }}</td>
+        <td class="team-hq_team">{{ form.advisor_3_hq_team }}</td>
+        <td>{{ form.advisor_3_location }}</td>
+      </tr>
+      <tr class="advisor">
+        <td>{{ form.advisor_4_name }}</td>
+        <td class="team-type">{{ form.advisor_4_team_type }}</td>
+        <td class="team-hq_team">{{ form.advisor_4_hq_team }}</td>
+        <td>{{ form.advisor_4_location }}</td>
+      </tr>
+    </table>
+
+    <h3>Support provided</h3>
+
+
+    {% include "wins/win-details-element.html" with name="HVO Programme, if applicable" val=win.hvo_programme required=False %}
+    {% include "wins/win-details-element.html" with name="Have HVO Specialists been involved" val=win.has_hvo_specialist_involvement %}
+    {% include "wins/win-details-element.html" with name="Is this win Prosperity Fund related" val=win.is_prosperity_fund_related %}
+    {% include "wins/win-details-element.html" with name="Does the win relate to e-exporting" val=win.is_e_exported %}
+    {% include "wins/win-details-element.html" with name="Type of support 1" val=win.type_of_support_1 %}
+    {% include "wins/win-details-element.html" with name="Type of support 2" val=win.type_of_support_2 required=False %}
+    {% include "wins/win-details-element.html" with name="Type of support 3" val=win.type_of_support_3 required=False %}
+    {% include "wins/win-details-element.html" with name="Associated programme 1" val=win.associated_programme_1 required=False %}
+    {% include "wins/win-details-element.html" with name="Associated programme 2" val=win.associated_programme_2 required=False %}
+    {% include "wins/win-details-element.html" with name="Associated programme 3" val=win.associated_programme_3 required=False %}
+
+    <hr />
+
+    {% include "wins/win-details-element.html" with name="I confirm that the information above is complete and accurate" val=win.is_personally_confirmed %}
+    {% include "wins/win-details-element.html" with name="My line manager has confirmed the decision to record this win" val=win.is_line_manager_confirmed %}
+
+{% endblock content %}

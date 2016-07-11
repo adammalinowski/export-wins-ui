@@ -70,25 +70,7 @@ class ConfirmationFormMetaclass(ReflectiveFormMetaclass):
         return new_class
 
 
-class RabbitMixin(object):
-
-    def push(self, url, data):
-        """ POST data to URL on data server, return json response """
-
-        # The POST request is http-url-encoded rather than json-encoded for now
-        # since I don't know how to set it that way and don't have the time to
-        # find out.
-        response = rabbit.post(url, data=data, request=self.request)
-
-        if not response.status_code == 201:
-            raise forms.ValidationError(
-                "Something has gone terribly wrong.  Please contact support.")
-
-        return response.json()
-
-
-class WinForm(RabbitMixin, BootstrappedForm,
-              metaclass=WinReflectiveFormMetaclass):
+class WinForm(BootstrappedForm, metaclass=WinReflectiveFormMetaclass):
 
     # We're only caring about MM/YYYY formatted dates
     date = forms.fields.CharField(max_length=7, label="Date business won")
@@ -158,53 +140,34 @@ class WinForm(RabbitMixin, BootstrappedForm,
             raise forms.ValidationError("This is a required field")
         return r
 
-    def save(self):
+    def create(self):
         """ Push cleaned data to appropriate data server access points """
 
+        self.cleaned_data["complete"] = False
         # This doesn't really matter, since the data server ignores this value
         # and substitutes the logged-in user id.  However, if you don't provide
         # it, the serialiser explodes, so we attach it for kicks.
         self.cleaned_data["user"] = self.request.user.pk
 
-        win = self.push(settings.WINS_AP, self.cleaned_data)
+        win = rabbit.push(settings.WINS_AP, self.cleaned_data, self.request)
 
         for data in self._get_breakdown_data(win["id"]):
-            self.push(settings.BREAKDOWNS_AP, data)
+            rabbit.push(settings.BREAKDOWNS_AP, data, self.request)
 
         for data in self._get_advisor_data(win["id"]):
-            self.push(settings.ADVISORS_AP, data)
+            rabbit.push(settings.ADVISORS_AP, data, self.request)
 
-        self.send_notifications(win["id"])
+    def update(self, win_id):
+        # partial update?
 
-    def send_notifications(self, win_id):
-        """
-        Tell the data server to send mail. Failures will not blow up at the
-        client, but will blow up the server, so we'll be notified if something
-        goes wrong.
-        """
-
-        # tell data server to send officer notification
-        # initially concieved to tell officer that customer notifciation has
-        # been sent, but since that is currently manually managed, we in fact
-        # only send an intermediate email letting them know that someday we will
-        # send the customer an email (later by manual process)
-        rabbit.post(settings.NOTIFICATIONS_AP, data={
-            "win": win_id,
-            "type": "o",  # officer notification
-            "user": self.request.user.pk,
-        })
-
-        # tell data sever to send customer notification
-        # currently commented out and handled manually by management command
-        # in data server and gino
-        # rabbit.post(settings.NOTIFICATIONS_AP, data={
-        #     "win": win_id,
-        #     "type": "c",  # customer notification
-        #     "recipient": self.cleaned_data["customer_email_address"],
-        #     "url": self.request.build_absolute_uri(
-        #         reverse("responses", kwargs={"pk": win_id})
-        #     )
-        # })
+        self.cleaned_data["complete"] = False  # hmm
+        self.cleaned_data["user"] = self.request.user.pk  # (see above)
+        rabbit.push(
+            settings.WINS_AP + win_id + '/',
+            self.cleaned_data,
+            self.request,
+            'put',
+        )
 
     def _add_breakdown_fields(self):
         """ Create breakdown fields """
@@ -296,8 +259,7 @@ class WinForm(RabbitMixin, BootstrappedForm,
         return advisor_data
 
 
-class ConfirmationForm(RabbitMixin, BootstrappedForm,
-                       metaclass=ConfirmationFormMetaclass):
+class ConfirmationForm(BootstrappedForm, metaclass=ConfirmationFormMetaclass):
 
     win = forms.CharField(max_length=128)
 
@@ -314,6 +276,10 @@ class ConfirmationForm(RabbitMixin, BootstrappedForm,
 
     def save(self):
 
-        confirmation = self.push(settings.CONFIRMATIONS_AP, self.cleaned_data)
+        confirmation = rabbit.push(
+            settings.CONFIRMATIONS_AP,
+            self.cleaned_data,
+            self.request,
+        )
 
         self.send_notifications(confirmation)

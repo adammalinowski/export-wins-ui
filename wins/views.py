@@ -4,33 +4,132 @@ from dateutil.relativedelta import relativedelta
 
 from django.conf import settings
 from django.core.urlresolvers import reverse
+from django.http import Http404
+from django.shortcuts import redirect
 from django.utils import timezone
-from django.views.generic import FormView
+from django.views.generic import FormView, TemplateView
 
 from .forms import WinForm, ConfirmationForm
 from alice.braces import LoginRequiredMixin
 from alice.helpers import rabbit
 
 
-class NewWinView(LoginRequiredMixin, FormView):
+class MyWinsView(TemplateView, LoginRequiredMixin):
+    """ View a list of all Wins of logged in User """
+
+    template_name = 'wins/my-wins.html'
+
+    def get_context_data(self, **kwargs):
+        context = TemplateView.get_context_data(self, **kwargs)
+
+        url = settings.WINS_AP + '?user__id=' + str(self.request.user.id)
+        wins = rabbit.get(url, request=self.request).json()
+        context['wins'] = wins
+        return context
+
+
+def get_win(win_id, request):
+    url = settings.WINS_AP + '?id=' + win_id
+    resp = rabbit.get(url, request=request)
+    if resp.status_code != 200:
+        raise Http404
+    else:
+        return resp.json()['results'][0]
+
+
+class WinView(TemplateView, LoginRequiredMixin):
+    """ View details of a Win of logged in User """
+
+    template_name = 'wins/win-details.html'
+
+    def get_context_data(self, **kwargs):
+        context = TemplateView.get_context_data(self, **kwargs)
+        context['win'] = get_win(kwargs['pk'], self.request)
+        return context
+
+
+class WinCompleteView(TemplateView, LoginRequiredMixin):
+    """ Mark win complete """
+
+    template_name = 'wins/win-complete.html'
+
+    def get_context_data(self, **kwargs):
+        context = TemplateView.get_context_data(self, **kwargs)
+        context['win'] = get_win(kwargs['pk'], self.request)
+        return context
+
+    def post(self, *args, **kwargs):
+        """ POST means user has confirmed they want to submit """
+
+        rabbit.push(
+            settings.WINS_AP + kwargs['pk'] + '/',
+            {'complete': True},
+            self.request,
+            'patch',
+        )
+        return redirect('complete-win-success')
+
+
+class BaseWinFormView(FormView, LoginRequiredMixin):
+    """ Base class for adding and editing Wins """
 
     template_name = "wins/win-form.html"
     form_class = WinForm
 
+    def get_form_kwargs(self):
+        kwargs = FormView.get_form_kwargs(self)
+        kwargs["request"] = self.request
+        return kwargs
+
+
+class NewWinView(BaseWinFormView):
+    """ Create a new Win """
+
     def form_valid(self, form):
-        form.save()
+        """ If form is valid, create on data server """
+        form.create()
         return FormView.form_valid(self, form)
 
     def get_success_url(self):
-        return reverse("thanks")
+        "New Export Win saved"
+        "Thank you for submitting a new Export Win"
+        "The details of this win will be forwarded to the customer for"
+        # if you don't want that to happen, click here.
 
-    def get_form_kwargs(self):
-        r = FormView.get_form_kwargs(self)
-        r["request"] = self.request
-        return r
+        return reverse("new-win-success")
+
+
+class EditWinView(BaseWinFormView):
+    """ Edit a Win of logged in User """
+
+    def get_initial(self):
+        # save here for context data, can't get in init because self.kwargs
+        # gets set in `view`, create by `as_view`
+        self.win = get_win(self.kwargs['pk'], self.request)
+
+        # if self.win['complete']:
+        #     raise Exception('complete')
+        initial = self.win
+        initial['date'] = date_parser(initial['date']).strftime('%m/%Y')
+        return initial
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['win'] = self.win
+        return context
+
+    def form_valid(self, form):
+        """ If form is valid, update on data server """
+
+        form.update(self.kwargs['pk'])
+        return FormView.form_valid(self, form)
+
+    def get_success_url(self):
+        return reverse("edit-win-success")
 
 
 class ConfirmationView(FormView):
+    """ Create a new Customer Response """
 
     template_name = "wins/confirmation-form.html"
     form_class = ConfirmationForm
@@ -140,6 +239,3 @@ class ConfirmationView(FormView):
             )
 
         return win_dict
-
-def test500(request):
-    raise Exception('test error')

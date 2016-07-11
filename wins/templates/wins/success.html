@@ -10,12 +10,19 @@
 
   <style>
     h2 {
-      margin: 50px auto;
+      margin: 1em auto;
       text-align: center;
       background-color: #be0048;
-      padding: 2em;
+      padding: 1em;
       border-radius: 1em;
       color: #ffffff;
+    }
+    .btn {
+      margin-right: 1em;
+    }
+    .alert {
+      margin-bottom: 2em;
+      font-size: 1.2em;
     }
   </style>
 
@@ -23,25 +30,22 @@
 
 
 {% block content %}
-  <h2>Thank you for submitting a new Export Win.</h2>
+
+  <h2>{% block success %}{% endblock %}</h2>
+
   <div class="alert alert-info">
-    <p>This win will be forwarded to the customer shortly.</p>
-    <p>
-      While we are testing the new digital process, there may be a delay before
-      we contact Customers to confirm Export Wins.
-    </p>
-    <p>
-      We will let you know by email when we contact your Customer to confirm
-      this win.
-    </p>
+    {% block message %}{% endblock %}
+    <br>
     <p>
       If you would like to offer feedback on this service, please contact us,
       giving brief details, using the button below.
     </p>
   </div>
+
   <div class="text-center">
-    <a href="{% url 'new' %}" class="btn btn-primary">Record a New Export Win</a><br />
-    <br />
+    <a href="{% url 'new-win' %}" class="btn btn-primary">Record a New Export Win</a>
+    <a href="{% url 'my-wins' %}" class="btn btn-primary">My Wins</a>
     <a href="mailto:{{ FEEDBACK_EMAIL }}?subject=Export%20Wins%20Feedback" class="btn btn-info">Provide Feedback</a>
   </div>
+
 {% endblock content %}

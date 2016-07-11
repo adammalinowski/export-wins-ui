@@ -22,6 +22,12 @@
     #id_description {
       height: 9em;
     }
+    .end_buttons {
+      text-align: center;
+    }
+    .btn {
+      margin-right: 1em;
+    }
   </style>
 {% endblock css %}
 
@@ -48,6 +54,7 @@
   {% endif %}
 
   <form method="post">
+    {% csrf_token %}
 
     <h3>Lead officer's details</h3>
     {% include "wins/win-field.html" with field=form.lead_officer_name %}
@@ -75,88 +82,89 @@
       by the customer.
     </p>
 
-    {% include "wins/win-field.html" with field=form.business_type help="e.g. export sales, contract, order, distributor, tender /competition win, joint venture, outward investment, etc." %}
-    {% include "wins/win-field.html" with field=form.description help="Please provide details of any key products services provided, missions, initiatives, etc." %}
-    {% include "wins/win-field.html" with field=form.name_of_customer %}
-    {% include "wins/win-field.html" with field=form.name_of_export %}
-    {% include "wins/win-field.html" with field=form.date help="Enter month and year in the format MM/YYYY." %}
-    {% include "wins/win-field.html" with field=form.country %}
+    {% if not win.complete %}
+      {% include "wins/win-field.html" with field=form.business_type help="e.g. export sales, contract, order, distributor, tender /competition win, joint venture, outward investment, etc." %}
+      {% include "wins/win-field.html" with field=form.description help="Please provide details of any key products services provided, missions, initiatives, etc." %}
+      {% include "wins/win-field.html" with field=form.name_of_customer %}
+      {% include "wins/win-field.html" with field=form.name_of_export %}
+      {% include "wins/win-field.html" with field=form.date help="Enter month and year in the format MM/YYYY." %}
+      {% include "wins/win-field.html" with field=form.country %}
 
-    <hr />
-    <h3>Expected value of the win</h3>
-    <p>
-      These questions help us to understand the £ value of the customer's win
-      over a five year period. How much of that £ value is UK exports and how
-      much is non-export value. We will use these aggregated values to help
-      demonstrate the contribution to the Government's £1 trillion by 2020
-      export target.
-      <br />
-      <br />
-      Please see guidance and FAQs.
-    </p>
+      <hr />
+      <h3>Expected value of the win</h3>
+      <p>
+        These questions help us to understand the £ value of the customer's win
+        over a five year period. How much of that £ value is UK exports and how
+        much is non-export value. We will use these aggregated values to help
+        demonstrate the contribution to the Government's £1 trillion by 2020
+        export target.
+        <br />
+        <br />
+        Please see guidance and FAQs.
+      </p>
 
-    <div class="form-group {{ form.type.errors|yesno:'error,' }}">
-      {{ form.type.errors }}
-      <h4>
-        {% if form.type.field.required %}<span class="required">*</span>{% endif %}
-        Type of win
-      </h4>
-      {% if help %}<div class="help-text">{{ help }}</div>{% endif %}
-      {% if tooltip %}
-        <span class="glyphicon glyphicon-info-sign" data-toggle="tooltip" data-original-title="{{ tooltip }}"></span>
-      {% endif %}
-      {{ form.type }}
-      <div class="clearfix"></div>
-    </div>
-    <hr />
+      <div class="form-group {{ form.type.errors|yesno:'error,' }}">
+        {{ form.type.errors }}
+        <h4>
+          {% if form.type.field.required %}<span class="required">*</span>{% endif %}
+          Type of win
+        </h4>
+        {% if help %}<div class="help-text">{{ help }}</div>{% endif %}
+        {% if tooltip %}
+          <span class="glyphicon glyphicon-info-sign" data-toggle="tooltip" data-original-title="{{ tooltip }}"></span>
+        {% endif %}
+        {{ form.type }}
+        <div class="clearfix"></div>
+      </div>
+      <hr />
 
-    <h4>Export value</h4>
+      <h4>Export value</h4>
 
-    {% include "wins/win-field.html" with field=form.total_expected_export_value help="Enter whole numbers in £ e.g. for one-and-a-half-million, enter 1500000 <br /> The total expected value should be the sum of the annual values of the win." %}
+      {% include "wins/win-field.html" with field=form.total_expected_export_value help="Enter whole numbers in £ e.g. for one-and-a-half-million, enter 1500000 <br /> The total expected value should be the sum of the annual values of the win." %}
 
-    <table class="table table-responsive">
-      <tr>
-        <th>{{ form.breakdown_exports_0.label_tag }}</th>
-        <th>{{ form.breakdown_exports_1.label_tag }}</th>
-        <th>{{ form.breakdown_exports_2.label_tag }}</th>
-        <th>{{ form.breakdown_exports_3.label_tag }}</th>
-        <th>{{ form.breakdown_exports_4.label_tag }}</th>
-      </tr>
-      <tr>
-        <td {% if form.breakdown_exports_0.errors %} class="error"{% endif %}>{{ form.breakdown_exports_0 }}</td>
-        <td {% if form.breakdown_exports_1.errors %} class="error"{% endif %}>{{ form.breakdown_exports_1 }}</td>
-        <td {% if form.breakdown_exports_2.errors %} class="error"{% endif %}>{{ form.breakdown_exports_2 }}</td>
-        <td {% if form.breakdown_exports_3.errors %} class="error"{% endif %}>{{ form.breakdown_exports_3 }}</td>
-        <td {% if form.breakdown_exports_4.errors %} class="error"{% endif %}>{{ form.breakdown_exports_4 }}</td>
-      </tr>
-    </table>
+      <table class="table table-responsive">
+        <tr>
+          <th>{{ form.breakdown_exports_0.label_tag }}</th>
+          <th>{{ form.breakdown_exports_1.label_tag }}</th>
+          <th>{{ form.breakdown_exports_2.label_tag }}</th>
+          <th>{{ form.breakdown_exports_3.label_tag }}</th>
+          <th>{{ form.breakdown_exports_4.label_tag }}</th>
+        </tr>
+        <tr>
+          <td {% if form.breakdown_exports_0.errors %} class="error"{% endif %}>{{ form.breakdown_exports_0 }}</td>
+          <td {% if form.breakdown_exports_1.errors %} class="error"{% endif %}>{{ form.breakdown_exports_1 }}</td>
+          <td {% if form.breakdown_exports_2.errors %} class="error"{% endif %}>{{ form.breakdown_exports_2 }}</td>
+          <td {% if form.breakdown_exports_3.errors %} class="error"{% endif %}>{{ form.breakdown_exports_3 }}</td>
+          <td {% if form.breakdown_exports_4.errors %} class="error"{% endif %}>{{ form.breakdown_exports_4 }}</td>
+        </tr>
+      </table>
 
-    {% include "wins/win-field.html" with field=form.goods_vs_services %}
-    {% include "wins/win-field.html" with field=form.sector %}
+      {% include "wins/win-field.html" with field=form.goods_vs_services %}
+      {% include "wins/win-field.html" with field=form.sector %}
 
-    <hr />
+      <hr />
 
-    <h4>Non-export value</h4>
+      <h4>Non-export value</h4>
 
-    {% include "wins/win-field.html" with field=form.total_expected_non_export_value help="Enter whole numbers in £ e.g. for one-and-a-half-million, enter 1500000 <br /> The total expected value should be the sum of the annual values of the win." %}
+      {% include "wins/win-field.html" with field=form.total_expected_non_export_value help="Enter whole numbers in £ e.g. for one-and-a-half-million, enter 1500000 <br /> The total expected value should be the sum of the annual values of the win." %}
 
-    <table class="table table-responsive">
-      <tr>
-        <th>{{ form.breakdown_non_exports_0.label_tag }}</th>
-        <th>{{ form.breakdown_non_exports_1.label_tag }}</th>
-        <th>{{ form.breakdown_non_exports_2.label_tag }}</th>
-        <th>{{ form.breakdown_non_exports_3.label_tag }}</th>
-        <th>{{ form.breakdown_non_exports_4.label_tag }}</th>
-      </tr>
-      <tr>
-        <td {% if form.breakdown_non_exports_0.errors %} class="error"{% endif %}>{{ form.breakdown_non_exports_0 }}</td>
-        <td {% if form.breakdown_non_exports_1.errors %} class="error"{% endif %}>{{ form.breakdown_non_exports_1 }}</td>
-        <td {% if form.breakdown_non_exports_2.errors %} class="error"{% endif %}>{{ form.breakdown_non_exports_2 }}</td>
-        <td {% if form.breakdown_non_exports_3.errors %} class="error"{% endif %}>{{ form.breakdown_non_exports_3 }}</td>
-        <td {% if form.breakdown_non_exports_4.errors %} class="error"{% endif %}>{{ form.breakdown_non_exports_4 }}</td>
-      </tr>
-    </table>
-
+      <table class="table table-responsive">
+        <tr>
+          <th>{{ form.breakdown_non_exports_0.label_tag }}</th>
+          <th>{{ form.breakdown_non_exports_1.label_tag }}</th>
+          <th>{{ form.breakdown_non_exports_2.label_tag }}</th>
+          <th>{{ form.breakdown_non_exports_3.label_tag }}</th>
+          <th>{{ form.breakdown_non_exports_4.label_tag }}</th>
+        </tr>
+        <tr>
+          <td {% if form.breakdown_non_exports_0.errors %} class="error"{% endif %}>{{ form.breakdown_non_exports_0 }}</td>
+          <td {% if form.breakdown_non_exports_1.errors %} class="error"{% endif %}>{{ form.breakdown_non_exports_1 }}</td>
+          <td {% if form.breakdown_non_exports_2.errors %} class="error"{% endif %}>{{ form.breakdown_non_exports_2 }}</td>
+          <td {% if form.breakdown_non_exports_3.errors %} class="error"{% endif %}>{{ form.breakdown_non_exports_3 }}</td>
+          <td {% if form.breakdown_non_exports_4.errors %} class="error"{% endif %}>{{ form.breakdown_non_exports_4 }}</td>
+        </tr>
+      </table>
+    {% endif %}
 
     <hr />
 
@@ -241,18 +249,20 @@
       <div class="clearfix"></div>
     </div>
 
-    {% csrf_token %}
 
     <p class="well">
-      Before submitting, you may wish to print this window using your browser
-      to save a copy for your records.
+      After you have saved your win, you will be able to continue editing it until you are satisfied that you have
+      got the details correct. You may then send it to the customer for confirmation by...
     </p>
 
     <div class="end-buttons">
-      <input type="submit" name="s" value="Submit Record" class="btn btn-primary" />
+      <a href="{% url 'index' %}" class="btn btn-danger">Cancel</a>
+      <input type="submit" name="save" value="Save Record" class="btn btn-primary" />
     </div>
 
   </form>
+
+  <br><br><br><br><br><br><br>
 {% endblock content %}
 
 

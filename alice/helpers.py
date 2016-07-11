@@ -66,6 +66,12 @@ class Rabbit(object):
     def post(self, url, *args, **kwargs):
         return self._request("post", url, *args, **kwargs)
 
+    def put(self, url, *args, **kwargs):
+        return self._request("put", url, *args, **kwargs)
+
+    def patch(self, url, *args, **kwargs):
+        return self._request("patch", url, *args, **kwargs)
+
     @classmethod
     def _request(cls, method, url, request=None, keep_trying=False, *args,
                  **kwargs):
@@ -131,6 +137,21 @@ class Rabbit(object):
                 time.sleep(1)
                 return cls.send_request(prepared_request, True)
             raise e
+
+    def push(self, url, data, request, method='post'):
+        """ POST/PUT/PATCH data to URL on data server, return json response """
+
+        # The POST request is http-url-encoded rather than json-encoded for now
+        # since I don't know how to set it that way and don't have the time to
+        # find out.
+        resp = getattr(self, method)(url, data=data, request=request)
+
+        if ((method == 'post' and resp.status_code != 201)
+            or (method == 'put' and resp.status_code != 200)):
+            raise forms.ValidationError(
+                "Something has gone terribly wrong.  Please contact support.")
+
+        return resp.json()
 
 
 rabbit = Rabbit()

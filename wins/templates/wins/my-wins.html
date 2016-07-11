@@ -1,0 +1,69 @@
+{% extends 'ui/base.html' %}
+
+{% load staticfiles %}
+
+{% block css %}
+  {{ block.super }}
+  <style>
+    th {
+        font-weight: bold;
+        font-size: 1.3em;
+        padding: 0 1em .8em 0;
+    }
+    td {
+        padding: 0 0 .5em 0;
+    }
+    .company {
+        font-size: 1.4em;
+    }
+    .winlink {
+        margin-left: 1em;
+    }
+  </style>
+{% endblock css %}
+
+{% block content %}
+
+    <h2>My Wins</h2>
+
+    {% if wins.results %}
+        <table>
+            <tr>
+                <th>
+                    Company
+                </th>
+                <th>
+                    Edit
+                </th>
+                <th>
+                    Send to customer
+                </th>
+            </tr>
+            {% for win in wins.results %}
+                <tr>
+                    <td>
+                        <span class="company">
+                            <a href="{% url 'win-details' win.id %}">{{ win.company_name }}</a>
+                        </span>
+                    </td>
+                    <td>
+                        <a href="{% url 'win-edit' win.id %}" class="winlink">edit</a>
+                    </td>
+                    <td>
+                        {% if win.complete %}
+                            <b>sent to customer</b>
+                        {% else %}
+                            <a href="{% url 'win-complete' win.id %}">send to customer</a>
+                        {% endif %}
+                    </td>
+                </tr>
+            {% endfor %}
+        </table>
+    {% else %}
+        You have not yet recorded any wins
+    {% endif %}
+
+    <br><br>
+    <a href="{% url 'new-win' %}" class="btn btn-primary">Record a New Export Win</a>
+
+{% endblock content %}

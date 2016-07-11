@@ -1,0 +1,55 @@
+{% extends 'ui/base.html' %}
+
+
+{% load staticfiles %}
+
+
+{% block css %}
+
+  {{ block.super }}
+
+  <style>
+
+    .btn {
+      margin-right: 1em;
+    }
+
+  </style>
+
+{% endblock css %}
+
+
+{% block content %}
+
+  {% if win.complete %}
+    This win has already been marked complete and sent to the customer.
+
+    <br><br>
+
+    <a href="{% url 'my-wins' %}" class="btn btn-primary">My Wins</a>
+  {% else %}
+    Please review this information about your win, if you are confident your
+    customer will agree you can mark this win complete, and a form will be
+    sent to the customer for their confirmation of these details.
+
+    If you are unsure you may wish to contact the customer.
+
+    You can edit these details now, but once the win is marked as complete and
+    the customer has been contacted, you will not be able to change these details
+
+    <br><br>
+
+    {{ win }}
+
+    <br><br>
+
+    <form method="post">
+      {% csrf_token %}
+      <a href="{% url 'my-wins' %}" class="btn btn-danger">Cancel</a>
+      <a href="{% url 'win-edit' win.id %}" class="btn btn-primary">Edit Win</a>
+      <input type="submit" name="complete" value="Complete Win" class="btn btn-primary" />
+    </form>
+
+  {% endif %}
+
+{% endblock content %}

@@ -9,6 +9,9 @@
   {{ block.super }}
 
   <style>
+    .btn {
+      margin-right: 1em;
+    }
   </style>
 
 {% endblock css %}
@@ -18,26 +21,14 @@
 
   <div class="alert alert-info">
     <p>
-      Before you start, you should have all of the information you need to
-      complete the form with you (refer to the screenshots in the user guidance
-      to see the information required).
-    </p>
-{#    <p>Mandatory fields are marked with an asterisk (*).</p>#}
-    <p>
-      Currently, you must complete the data input for each form within 24
-      hours.
-    </p>
-    <p>
-      You can leave the form open in a browser window or tab while you do this,
-      but if you close this window/tab or exceed the 24 hour limit for a session
-      before you submit the form then you will lose the information you have
-      entered up to that point and will have to re-enter it when you begin
-      again.
+      [overview of how process works, can save form in intermediate stage, later confirm]
     </p>
   </div>
 
   <div style="text-align: center;" class="well">
-    <a href="{% url 'new' %}" class="btn btn-primary">Record a New Export Win</a>
+    <a href="{% url 'my-wins' %}" class="btn btn-primary">My Wins</a>
+    <a href="{% url 'new-win' %}" class="btn btn-primary">Record a New Export Win</a>
   </div>
+
 
 {% endblock content %}
