@@ -141,15 +141,19 @@ class Rabbit(object):
     def push(self, url, data, request, method='post'):
         """ POST/PUT/PATCH data to URL on data server, return json response """
 
-        # The POST request is http-url-encoded rather than json-encoded for now
-        # since I don't know how to set it that way and don't have the time to
-        # find out.
+        assert method in ['post', 'put', 'patch'], 'invalid method'
+
         resp = getattr(self, method)(url, data=data, request=request)
 
-        if ((method == 'post' and resp.status_code != 201)
-            or (method == 'put' and resp.status_code != 200)):
-            raise forms.ValidationError(
-                "Something has gone terribly wrong.  Please contact support.")
+        # error if do not get expected response from data server
+        if ((method == 'post' and resp.status_code != 201) or
+                (method == 'put' and resp.status_code != 200) or
+                (method == 'patch' and resp.status_code != 200)):
+
+            raise Exception("Rabbit error: {} - {}".format(
+                resp.status_code,
+                resp.content,
+            ))
 
         return resp.json()
 
