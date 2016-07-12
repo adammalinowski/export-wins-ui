@@ -6,6 +6,7 @@
   {{ block.super }}
   <style>
     th {
+        text-align: left!important;
         font-weight: bold;
         font-size: 1.3em;
         padding: 0 1em .8em 0;
@@ -15,9 +16,14 @@
     }
     .company {
         font-size: 1.4em;
+        margin-right: 2em;
     }
-    .winlink {
-        margin-left: 1em;
+    .edit {
+        margin-right: 2em;
+    }
+    .sent {
+        font-size: 1.1em;
+        font-weight: bold;
     }
   </style>
 {% endblock css %}
@@ -42,18 +48,16 @@
             {% for win in wins.results %}
                 <tr>
                     <td>
-                        <span class="company">
-                            <a href="{% url 'win-details' win.id %}">{{ win.company_name }}</a>
-                        </span>
+                        <a href="{% url 'win-details' win.id %}" class="company">{{ win.company_name }}</a>
                     </td>
-                    <td>
-                        <a href="{% url 'win-edit' win.id %}" class="winlink">edit</a>
+                    <td class="edit">
+                        <a href="{% url 'win-edit' win.id %}" class="btn btn-primary edit">edit</a>
                     </td>
-                    <td>
+                    <td class="sent">
                         {% if win.complete %}
-                            <b>sent to customer</b>
+                            <span class="sent">sent to customer</sent>
                         {% else %}
-                            <a href="{% url 'win-complete' win.id %}">send to customer</a>
+                            <a href="{% url 'win-complete' win.id %}" class="btn btn-warning">send to customer</a>
                         {% endif %}
                     </td>
                 </tr>
