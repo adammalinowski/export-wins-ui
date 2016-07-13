@@ -82,6 +82,7 @@ class WinForm(BootstrappedForm, metaclass=WinReflectiveFormMetaclass):
 
         self.request = kwargs.pop("request")
         exclude_non_editable_fields = kwargs.pop('exclude_non_editable', False)
+        advisors = kwargs.pop('advisors')
 
         super().__init__(*args, **kwargs)
 
@@ -282,9 +283,9 @@ class WinForm(BootstrappedForm, metaclass=WinReflectiveFormMetaclass):
                 for name, field_name, _ in instance_data
             }
             if not instance_dict['name']:
-                # ignore any instances where user has not input a name
+                # ignore any instances where user has not input a name -------------------- this will be a problem if we want to delete them...
                 continue
-            # manually add the foriegn key for the newly created win
+            # manually add the foriegn key for the win (for when newly created)
             instance_dict['win'] = win_id
             advisor_data.append(instance_dict)
         return advisor_data

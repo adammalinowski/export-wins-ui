@@ -37,6 +37,15 @@ def get_win(win_id, request):
         return resp.json()['results'][0]
 
 
+def get_win_advisors(win_id, request):
+    url = settings.ADVISORS_AP + '?win__id=' + win_id
+    resp = rabbit.get(url, request=request)
+    if resp.status_code != 200:
+        raise Http404
+    else:
+        return resp.json()['results']
+
+
 class WinView(TemplateView, LoginRequiredMixin):
     """ View details of a Win of logged in User """
 
@@ -107,10 +116,10 @@ class EditWinView(BaseWinFormView):
         # gets set in `view`, create by `as_view`
         self.win = get_win(self.kwargs['pk'], self.request)
 
-        # if self.win['complete']:
-        #     raise Exception('complete')
         initial = self.win
         initial['date'] = date_parser(initial['date']).strftime('%m/%Y')
+
+        # add advisor data somehow...
         return initial
 
     def get_context_data(self, **kwargs):
@@ -121,6 +130,7 @@ class EditWinView(BaseWinFormView):
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
         kwargs['exclude_non_editable'] = True
+        kwargs['advisors'] = get_win_advisors(self.kwargs['pk'], self.request)
         return kwargs
 
     def form_valid(self, form):
