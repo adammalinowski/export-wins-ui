@@ -118,6 +118,11 @@ class EditWinView(BaseWinFormView):
         context['win'] = self.win
         return context
 
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs['exclude_non_editable'] = True
+        return kwargs
+
     def form_valid(self, form):
         """ If form is valid, update on data server """
 

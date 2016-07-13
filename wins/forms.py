@@ -81,8 +81,9 @@ class WinForm(BootstrappedForm, metaclass=WinReflectiveFormMetaclass):
     def __init__(self, *args, **kwargs):
 
         self.request = kwargs.pop("request")
+        exclude_non_editable_fields = kwargs.pop('exclude_non_editable', False)
 
-        BootstrappedForm.__init__(self, *args, **kwargs)
+        super().__init__(*args, **kwargs)
 
         self.date_format = 'MM/YYYY'  # the format the date field expects
 
@@ -101,10 +102,31 @@ class WinForm(BootstrappedForm, metaclass=WinReflectiveFormMetaclass):
         self.fields["total_expected_export_value"].initial = '0'
         self.fields["total_expected_non_export_value"].initial = '0'
 
-        self._add_breakdown_fields()
+        if not exclude_non_editable_fields:
+            self._add_breakdown_fields()
 
         self.advisor_fields = self._get_advisor_fields()
         self._add_advisor_fields()
+
+        # need to confirm these are correct. and for the fields which aren't
+        # in confirmation form - why?!
+        # also, think this should be used somewhere else...
+        non_editable_fields = [
+            'business_type',
+            'description',
+            'name_of_customer',
+            'name_of_export',
+            'type',
+            'goods_vs_services',
+            'sector',
+            'country',
+            'date',
+            'total_expected_export_value',
+            'total_expected_non_export_value',
+        ]
+        if exclude_non_editable_fields:
+            for field_name in non_editable_fields:
+                del self.fields[field_name]
 
     def clean_date(self):
         """ Validate date entered as a string and reformat for serializer """
@@ -143,7 +165,8 @@ class WinForm(BootstrappedForm, metaclass=WinReflectiveFormMetaclass):
     def create(self):
         """ Push cleaned data to appropriate data server access points """
 
-        self.cleaned_data["complete"] = False
+        self.cleaned_data["complete"] = False  # not until user does it
+
         # This doesn't really matter, since the data server ignores this value
         # and substitutes the logged-in user id.  However, if you don't provide
         # it, the serialiser explodes, so we attach it for kicks.
@@ -158,16 +181,24 @@ class WinForm(BootstrappedForm, metaclass=WinReflectiveFormMetaclass):
             rabbit.push(settings.ADVISORS_AP, data, self.request)
 
     def update(self, win_id):
-        # partial update?
+        """ Push editable fields to data server for updating """
 
-        self.cleaned_data["complete"] = False  # hmm
         self.cleaned_data["user"] = self.request.user.pk  # (see above)
         rabbit.push(
             settings.WINS_AP + win_id + '/',
             self.cleaned_data,
             self.request,
-            'put',
+            'patch',
         )
+
+        # todo... how to get id for updating?!?!
+        for data in self._get_advisor_data(win_id):
+            rabbit.push(
+                settings.ADVISORS_AP + advisor_id + '/',
+                data,
+                self.request,
+                'patch',
+            )
 
     def _add_breakdown_fields(self):
         """ Create breakdown fields """
