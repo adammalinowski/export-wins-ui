@@ -23,12 +23,15 @@
     }
     .sent {
         font-size: 1.1em;
-        font-weight: bold;
+        margin-right: 2em;
     }
   </style>
 {% endblock css %}
 
 {% block content %}
+
+    <a href="{% url 'new-win' %}" class="btn btn-primary">Record a New Export Win</a>
+    <br><br>
 
     <h2>My Wins</h2>
 
@@ -39,10 +42,10 @@
                     Company
                 </th>
                 <th>
-                    Edit
+                    Status
                 </th>
                 <th>
-                    Send to customer
+                    Action
                 </th>
             </tr>
             {% for win in wins.results %}
@@ -50,15 +53,15 @@
                     <td>
                         <a href="{% url 'win-details' win.id %}" class="company">{{ win.company_name }}</a>
                     </td>
-                    <td class="edit">
-                        <a href="{% url 'win-edit' win.id %}" class="btn btn-primary edit">edit</a>
-                    </td>
                     <td class="sent">
                         {% if win.complete %}
                             <span class="sent">sent to customer</sent>
                         {% else %}
-                            <a href="{% url 'win-complete' win.id %}" class="btn btn-warning">send to customer</a>
+                            <span class="sent">not yet sent to customer</sent>
                         {% endif %}
+                    </td>
+                    <td class="edit">
+                        <a href="{% url 'win-edit' win.id %}" class="btn btn-primary edit">open</a>
                     </td>
                 </tr>
             {% endfor %}
@@ -66,8 +69,5 @@
     {% else %}
         You have not yet recorded any wins
     {% endif %}
-
-    <br><br>
-    <a href="{% url 'new-win' %}" class="btn btn-primary">Record a New Export Win</a>
 
 {% endblock content %}

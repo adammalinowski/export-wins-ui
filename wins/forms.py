@@ -82,7 +82,7 @@ class WinForm(BootstrappedForm, metaclass=WinReflectiveFormMetaclass):
 
         self.request = kwargs.pop("request")
         exclude_non_editable_fields = kwargs.pop('exclude_non_editable', False)
-        advisors = kwargs.pop('advisors')
+        advisors = kwargs.pop('advisors', None)
 
         super().__init__(*args, **kwargs)
 

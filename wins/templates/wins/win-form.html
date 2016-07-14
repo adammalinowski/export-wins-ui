@@ -258,6 +258,9 @@
     <div class="end-buttons">
       <a href="{% url 'index' %}" class="btn btn-danger">Cancel</a>
       <input type="submit" name="save" value="Save Record" class="btn btn-primary" />
+      {% if win %}
+        <input type="submit" name="send" value="Save Record and Send to Customer" class="btn btn-warning" />
+      {% endif %}
     </div>
 
   </form>

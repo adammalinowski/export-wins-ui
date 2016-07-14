@@ -47,7 +47,7 @@
       {% csrf_token %}
       <a href="{% url 'my-wins' %}" class="btn btn-danger">Cancel</a>
       <a href="{% url 'win-edit' win.id %}" class="btn btn-primary">Edit Win</a>
-      <input type="submit" name="complete" value="Complete Win" class="btn btn-primary" />
+      <input type="submit" name="complete" value="Complete Win & Send to Customer" class="btn btn-warning" />
     </form>
 
   {% endif %}

@@ -140,7 +140,10 @@ class EditWinView(BaseWinFormView):
         return FormView.form_valid(self, form)
 
     def get_success_url(self):
-        return reverse("edit-win-success")
+        if self.request.POST.get('send'):
+            return reverse("win-complete", kwargs={'pk': self.kwargs['pk']})
+        else:
+            return reverse("edit-win-success")
 
 
 class ConfirmationView(FormView):
