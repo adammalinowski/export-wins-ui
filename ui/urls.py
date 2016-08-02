@@ -3,7 +3,7 @@ import os
 from django.conf.urls import url
 from django.views.generic import TemplateView
 
-from ui.views import IndexView, CSVView
+from ui.views import CSVView
 from users.views import LoginView, LogoutView
 from wins.views import (
     ConfirmationView, EditWinView, MyWinsView, NewWinView, WinCompleteView,
@@ -14,15 +14,10 @@ urlpatterns = [
 
     url(
         r"^$",
-        IndexView.as_view(),
+        MyWinsView.as_view(),
         name="index",
     ),
 
-    url(
-        r"^wins/$",
-        MyWinsView.as_view(),
-        name="my-wins",
-    ),
     url(
         r"^wins/new/$",
         NewWinView.as_view(),

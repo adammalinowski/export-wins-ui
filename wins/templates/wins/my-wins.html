@@ -42,10 +42,7 @@
                     Company
                 </th>
                 <th>
-                    Status
-                </th>
-                <th>
-                    Action
+                    Sent
                 </th>
             </tr>
             {% for win in wins.results %}
@@ -57,11 +54,8 @@
                         {% if win.complete %}
                             <span class="sent">sent to customer</sent>
                         {% else %}
-                            <span class="sent">not yet sent to customer</sent>
+                            <a href="{% url 'win-complete' win.id %}" class="btn btn-primary edit">send to customer</a>
                         {% endif %}
-                    </td>
-                    <td class="edit">
-                        <a href="{% url 'win-edit' win.id %}" class="btn btn-primary edit">open</a>
                     </td>
                 </tr>
             {% endfor %}

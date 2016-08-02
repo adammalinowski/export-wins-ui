@@ -2,14 +2,10 @@ import datetime
 
 from django.conf import settings
 from django.http import HttpResponse
-from django.views.generic import TemplateView, View
+from django.views.generic import View
 
 from alice.braces import LoginRequiredMixin
 from alice.helpers import rabbit
-
-
-class IndexView(LoginRequiredMixin, TemplateView):
-    template_name = "ui/index.html"
 
 
 class CSVView(LoginRequiredMixin, View):

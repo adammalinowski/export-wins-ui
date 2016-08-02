@@ -26,7 +26,7 @@
 
     <br><br>
 
-    <a href="{% url 'my-wins' %}" class="btn btn-primary">My Wins</a>
+    <a href="{% url 'index' %}" class="btn btn-primary">My Wins</a>
   {% else %}
     Please review this information about your win, if you are confident your
     customer will agree you can mark this win complete, and a form will be
@@ -45,7 +45,7 @@
 
     <form method="post">
       {% csrf_token %}
-      <a href="{% url 'my-wins' %}" class="btn btn-danger">Cancel</a>
+      <a href="{% url 'index' %}" class="btn btn-danger">Cancel</a>
       <a href="{% url 'win-edit' win.id %}" class="btn btn-primary">Edit Win</a>
       <input type="submit" name="complete" value="Complete Win & Send to Customer" class="btn btn-warning" />
     </form>
