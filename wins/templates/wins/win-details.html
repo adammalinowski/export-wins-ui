@@ -21,8 +21,6 @@
 
     <h1>Win</h1>
 
-    {{ win }}
-
     <h3>Lead officer's details</h3>
 
     {% include "wins/win-details-element.html" with name="Lead Officer" val=win.lead_officer_name %}
@@ -164,5 +162,8 @@
 
     {% include "wins/win-details-element.html" with name="I confirm that the information above is complete and accurate" val=win.is_personally_confirmed %}
     {% include "wins/win-details-element.html" with name="My line manager has confirmed the decision to record this win" val=win.is_line_manager_confirmed %}
+
+    <a href="{% url 'win-edit' win.id %}" class="btn btn-primary">edit</a>
+    <a href="{% url 'win-complete' win.id %}" class="btn btn-primary">send</a>
 
 {% endblock content %}

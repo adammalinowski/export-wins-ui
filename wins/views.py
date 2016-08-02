@@ -14,7 +14,7 @@ from alice.braces import LoginRequiredMixin
 from alice.helpers import rabbit
 
 
-class MyWinsView(TemplateView, LoginRequiredMixin):
+class MyWinsView(LoginRequiredMixin, TemplateView):
     """ View a list of all Wins of logged in User """
 
     template_name = 'wins/my-wins.html'
@@ -46,40 +46,43 @@ def get_win_advisors(win_id, request):
         return resp.json()['results']
 
 
-class WinView(TemplateView, LoginRequiredMixin):
+class WinView(LoginRequiredMixin, TemplateView):
     """ View details of a Win of logged in User """
 
     template_name = 'wins/win-details.html'
 
     def get_context_data(self, **kwargs):
         context = TemplateView.get_context_data(self, **kwargs)
-        context['win'] = get_win(kwargs['pk'], self.request)
+        context['win'] = get_win(kwargs['win_id'], self.request)
         return context
 
 
-class WinCompleteView(TemplateView, LoginRequiredMixin):
+class WinCompleteView(LoginRequiredMixin, TemplateView):
     """ Mark win complete """
 
     template_name = 'wins/win-complete.html'
 
     def get_context_data(self, **kwargs):
         context = TemplateView.get_context_data(self, **kwargs)
-        context['win'] = get_win(kwargs['pk'], self.request)
+        context['win'] = get_win(kwargs['win_id'], self.request)
         return context
 
     def post(self, *args, **kwargs):
         """ POST means user has confirmed they want to submit """
 
+        win_id = kwargs['win_id']
         rabbit.push(
-            settings.WINS_AP + kwargs['pk'] + '/',
+            settings.WINS_AP + win_id + '/',
             {'complete': True},
             self.request,
             'patch',
         )
-        return redirect('complete-win-success')
+        return redirect(
+            reverse("complete-win-success", kwargs={'win_id': win_id})
+        )
 
 
-class BaseWinFormView(FormView, LoginRequiredMixin):
+class BaseWinFormView(LoginRequiredMixin, FormView):
     """ Base class for adding and editing Wins """
 
     template_name = "wins/win-form.html"
@@ -96,16 +99,11 @@ class NewWinView(BaseWinFormView):
 
     def form_valid(self, form):
         """ If form is valid, create on data server """
-        form.create()
+        self.win = form.create()
         return FormView.form_valid(self, form)
 
     def get_success_url(self):
-        "New Export Win saved"
-        "Thank you for submitting a new Export Win"
-        "The details of this win will be forwarded to the customer for"
-        # if you don't want that to happen, click here.
-
-        return reverse("new-win-success")
+        return reverse("new-win-success", kwargs={'win_id': self.win['id']})
 
 
 class EditWinView(BaseWinFormView):
@@ -114,7 +112,7 @@ class EditWinView(BaseWinFormView):
     def get_initial(self):
         # save here for context data, can't get in init because self.kwargs
         # gets set in `view`, create by `as_view`
-        self.win = get_win(self.kwargs['pk'], self.request)
+        self.win = get_win(self.kwargs['win_id'], self.request)
 
         initial = self.win
         initial['date'] = date_parser(initial['date']).strftime('%m/%Y')
@@ -130,20 +128,24 @@ class EditWinView(BaseWinFormView):
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
         kwargs['exclude_non_editable'] = True
-        kwargs['advisors'] = get_win_advisors(self.kwargs['pk'], self.request)
+        kwargs['advisors'] = get_win_advisors(
+            self.kwargs['win_id'],
+            self.request,
+        )
         return kwargs
 
     def form_valid(self, form):
         """ If form is valid, update on data server """
 
-        form.update(self.kwargs['pk'])
+        form.update(self.kwargs['win_id'])
         return FormView.form_valid(self, form)
 
     def get_success_url(self):
+        win_id = self.kwargs['win_id']
         if self.request.POST.get('send'):
-            return reverse("win-complete", kwargs={'pk': self.kwargs['pk']})
+            return reverse("complete-win-success", kwargs={'win_id': win_id})
         else:
-            return reverse("edit-win-success")
+            return reverse("edit-win-success", kwargs={'win_id': win_id})
 
 
 class ConfirmationView(FormView):
@@ -166,8 +168,8 @@ class ConfirmationView(FormView):
 
         # quick hack to show sample customer response form with a known test win
         if request.path.endswith('sample/'):
-            kwargs['pk'] = os.getenv('SAMPLE_WIN', 'notconfigured')
-            self.kwargs['pk'] = kwargs['pk']
+            kwargs['win_id'] = os.getenv('SAMPLE_WIN', 'notconfigured')
+            self.kwargs['win_id'] = kwargs['win_id']
             self.sample = True
 
         try:

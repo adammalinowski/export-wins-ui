@@ -24,43 +24,43 @@ urlpatterns = [
         name="new-win",
     ),
 
-    # success pages after creating/editing/completing a win
-    url(
-        r"^wins/new-success/$",
-        TemplateView.as_view(template_name="wins/win-new-success.html"),
-        name="new-win-success"
-    ),
-    url(
-        r"^wins/edit-success/$",
-        TemplateView.as_view(template_name="wins/win-edit-success.html"),
-        name="edit-win-success"
-    ),
-    url(
-        r"^wins/complete-success/$",
-        TemplateView.as_view(template_name="wins/win-complete-success.html"),
-        name="complete-win-success"
-    ),
-
     # view/edit/complete a win
     url(
-        r"^wins/(?P<pk>[a-z0-9\-]{36})/$",
+        r"^wins/(?P<win_id>[a-z0-9\-]{36})/$",
         WinView.as_view(),
         name="win-details"
     ),
     url(
-        r"^wins/(?P<pk>[a-z0-9\-]{36})/edit/$",
+        r"^wins/(?P<win_id>[a-z0-9\-]{36})/edit/$",
         EditWinView.as_view(),
         name="win-edit"
     ),
     url(
-        r"^wins/(?P<pk>[a-z0-9\-]{36})/complete/$",
+        r"^wins/(?P<win_id>[a-z0-9\-]{36})/complete/$",
         WinCompleteView.as_view(),
         name="win-complete"
     ),
 
+    # success pages after creating/editing/completing a win
+    url(
+        r"^wins/(?P<win_id>[a-z0-9\-]{36})/new-success/$",
+        TemplateView.as_view(template_name="wins/win-new-success.html"),
+        name="new-win-success"
+    ),
+    url(
+        r"^wins/(?P<win_id>[a-z0-9\-]{36})/edit-success/$",
+        TemplateView.as_view(template_name="wins/win-edit-success.html"),
+        name="edit-win-success"
+    ),
+    url(
+        r"^wins/(?P<win_id>[a-z0-9\-]{36})/complete-success/$",
+        TemplateView.as_view(template_name="wins/win-complete-success.html"),
+        name="complete-win-success"
+    ),
+
     # review a win
     url(
-        r"^wins/review/(?P<pk>[a-z0-9\-]{36})/$",
+        r"^wins/review/(?P<win_id>[a-z0-9\-]{36})/$",
         ConfirmationView.as_view(),
         name="responses"
     ),

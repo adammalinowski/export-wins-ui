@@ -10,6 +10,8 @@
 
       You can edit this win via the 'My Wins' page.
 
-      The win is not complete until you have marked as complete for confirmation by the customer
+      or click <a href="{% url 'win-edit' win_id %}" class="btn btn-primary">here</a>
+
+      The win is not complete until you have marked as complete for confirmation by the customer. To do that click <a href="{% url 'win-complete' win_id %}" class="btn btn-primary">here</a>
   </p>
 {% endblock %}

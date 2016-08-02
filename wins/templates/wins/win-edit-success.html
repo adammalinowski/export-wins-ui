@@ -8,8 +8,12 @@
   <p>
       Thank you for editing this Export Win, your changes have been saved.
 
-      You can continue editing this win via the 'My Wins' page.
+      to see win details click <a href="{% url 'win-details' win_id %}" class="btn btn-primary">here</a>
 
-      The win is not complete until you have marked as complete for confirmation by the customer. You can do this by selecting 'mark complete' on the 'my wins page' (and/or maybe the win details page)
+      to continue editing click <a href="{% url 'win-edit' win_id %}" class="btn btn-primary">here</a>
+
+      The win is not complete until you have marked as complete for confirmation by the customer. you can click <a href="{% url 'win-complete' win_id %}" class="btn btn-primary">here</a>
+
+
   </p>
 {% endblock %}

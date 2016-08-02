@@ -181,6 +181,8 @@ class WinForm(BootstrappedForm, metaclass=WinReflectiveFormMetaclass):
         for data in self._get_advisor_data(win["id"]):
             rabbit.push(settings.ADVISORS_AP, data, self.request)
 
+        return win
+
     def update(self, win_id):
         """ Push editable fields to data server for updating """
 
